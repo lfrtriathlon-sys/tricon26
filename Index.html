@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Virtual Race Across Europe</title>
+    <style>
+        #map { height: 600px; width: 100%; border-radius: 10px; }
+        .team-marker { text-align: center; font-family: sans-serif; font-weight: bold; }
+        .team-img { width: 50px; height: 50px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .team-name { background: white; padding: 2px 6px; border-radius: 4px; margin-top: 2px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h2>Live Race Progress</h2>
+    <div id="map"></div>
+
+    <script>
+        // 1. YOUR SETTINGS
+        const API_KEY = 'AIzaSyAd1Up4V4rfhdV7o-y5iC7y32ytjy88RJA'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS-Xt-h-0CQFZRO6w_-g59HITWJSUnGVj3DgBf4MJ81jQHUDXy6HlB7rICnYXi5PU/exec';
+
+        async function initMap() {
+            // Load the Google Maps Library
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            const map = new Map(document.getElementById("map"), {
+                zoom: 4,
+                center: { lat: 48.8566, lng: 2.3522 }, // Starts in Paris
+                mapId: "DEMO_MAP_ID", // Required for Advanced Markers
+            });
+
+            // 2. Fetch data from your Google Sheet (via Apps Script)
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+
+            // 3. Draw the Race Route (The Line)
+            new google.maps.Polyline({
+                path: data.route,
+                geodesic: true,
+                strokeColor: "#3498db",
+                strokeOpacity: 0.8,
+                strokeWeight: 4,
+                map: map
+            });
+
+            // 4. Place the Teams
+            data.teams.forEach(team => {
+                const teamDiv = document.createElement('div');
+                teamDiv.className = 'team-marker';
+                teamDiv.innerHTML = `
+                    <img src="${team.image}" class="team-img">
+                    <div class="team-name">${team.name}</div>
+                `;
+
+                new AdvancedMarkerElement({
+                    map,
+                    position: { lat: team.lat, lng: team.lng },
+                    content: teamDiv,
+                    title: team.name
+                });
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd1Up4V4rfhdV7o-y5iC7y32ytjy88RJA&callback=initMap" async defer></script>
+</body>
+</html>
