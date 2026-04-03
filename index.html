@@ -11,12 +11,15 @@
 </head>
 <body>
     <h2>Live Race Progress</h2>
+    <div id="sync-time" style="text-align:center; padding:10px; font-weight:bold; color:#555;">
+  Waiting for sync data...
+</div>
     <div id="map"></div>
 
     <script>
         // 1. YOUR SETTINGS
         const API_KEY = 'AIzaSyAd1Up4V4rfhdV7o-y5iC7y32ytjy88RJA'; 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwS-Xt-h-0CQFZRO6w_-g59HITWJSUnGVj3DgBf4MJ81jQHUDXy6HlB7rICnYXi5PU/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmQ1q52InuL_xYNrv-SV-wQOe63MfHmT9qCYRB57ebyo1BcbQK0SkFbDxWWno5j4yT/exec';
 
         async function initMap() {
             // Load the Google Maps Library
@@ -58,7 +61,13 @@
                     content: teamDiv,
                     title: team.name
                 });
-            });
+              });
+            
+            // 5. Update the "Last Updated" timestamp in the HTML
+            if (data.updated) {
+                document.getElementById('sync-time').innerText = data.updated;
+            }     
+          
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAd1Up4V4rfhdV7o-y5iC7y32ytjy88RJA&callback=initMap" async defer></script>
